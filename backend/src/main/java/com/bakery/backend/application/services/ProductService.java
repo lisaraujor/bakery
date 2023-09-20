@@ -6,11 +6,14 @@ import org.modelmapper.ModelMapper;
 
 import com.bakery.backend.application.dtos.ProductDTO;
 import com.bakery.backend.domain.entities.Product;
+import com.bakery.backend.domain.exceptions.ProductNotFoundException;
 import com.bakery.backend.infrastructure.repositories.DbProductRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Sort;
 
 @Service
 public class ProductService {
@@ -24,16 +27,17 @@ public class ProductService {
     public Optional<ProductDTO> getById(Long id){
         Optional<Product> product = dbProductRepository.findById(id);
         
-        // if(product.isEmpty()){
-        //     throw new ResourceNotFoundException("Product with id: " + id + " not find");
-        // }
+        if(product.isEmpty()){
+            throw new ProductNotFoundException("Product with id " + id + " not found.");
+        }
 
         ProductDTO dto = new ModelMapper().map(product.get(), ProductDTO.class);
         return Optional.of(dto);
     }
 
     public List<ProductDTO> getAll(){
-        List<Product> products = dbProductRepository.findAll();
+        Sort sort = Sort.by(Sort.Direction.ASC, "id"); // Ordenar por ID em ordem crescente
+        List<Product> products = dbProductRepository.findAll(sort);
 
         return products.stream()
         .map(product -> new ModelMapper().map(product, ProductDTO.class))
@@ -53,17 +57,34 @@ public class ProductService {
     }
 
     public ProductDTO update(Long id, ProductDTO productDto){
-        productDto.setId(id);
         
-        ModelMapper mapper = new ModelMapper();
-        Product product = mapper.map(productDto, Product.class);
+        Optional<Product> existingProductOpt = dbProductRepository.findById(id);
+        
+        if (existingProductOpt.isPresent()){
+            Product product = existingProductOpt.get();
 
-        dbProductRepository.save(product);
+            product.setName(productDto.getName());
+            product.setPrice(productDto.getPrice());
+            product.setDescription(productDto.getDescription());
 
-        return productDto;
+            dbProductRepository.save(product);
+
+            ModelMapper mapper = new ModelMapper();
+            return mapper.map(product, ProductDTO.class);
+        }
+        else {
+            throw new ProductNotFoundException("Product with id " + id + " not found.");
+        }
     }
 
-    // public void deleteProduct(Long id) {
-    //     // Implemente a lógica para excluir um produto
-    // }
+    public void delete(Long id) {
+
+        Optional<Product> product = dbProductRepository.findById(id);
+
+        if(product.isEmpty()){
+            throw new ProductNotFoundException("Product with id " + id + " not found.");
+        }
+
+        dbProductRepository.deleteById(id);
+    }
 }
