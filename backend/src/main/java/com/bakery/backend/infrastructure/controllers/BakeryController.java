@@ -4,14 +4,15 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 
 import org.springframework.web.bind.annotation.*;
 
 import com.bakery.backend.application.dtos.BakeryDTO;
 import com.bakery.backend.application.dtos.ProductDTO;
 import com.bakery.backend.application.services.BakeryService;
-import com.bakery.backend.application.services.ProductService;
 
 @RestController
 @RequestMapping("/api/bakery")
@@ -24,7 +25,6 @@ public class BakeryController {
         this.bakeryService = bakeryService;
     }
 
-    
     @GetMapping
     public ResponseEntity<List<BakeryDTO>> getAll() {
         List<BakeryDTO> bakerys = bakeryService.getAll();
@@ -38,8 +38,8 @@ public class BakeryController {
         return new ResponseEntity<>(newBakery, HttpStatus.CREATED);
     }
 
-    @PutMapping("/addProduct/{id}")
-    public ResponseEntity<ProductDTO> addProduct(@PathVariable Long idBakery, @RequestBody Long idProduct, int quantity) {
+    @PutMapping("/addProduct/{idBakery}")
+    public ResponseEntity<ProductDTO> addProduct(@PathVariable Integer idBakery, @RequestBody Integer idProduct, Integer quantity) {
         ProductDTO addedProduct = bakeryService.addProductToStock(idBakery, idProduct, quantity);
         return ResponseEntity.ok(addedProduct);
     }

@@ -1,20 +1,25 @@
 package com.bakery.backend.domain.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+
 @Entity
 @Table(name = "bakery")
-public class Bakery implements Serializable {
+public class Bakery {
     
-    @Id // Primary key
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
@@ -22,24 +27,38 @@ public class Bakery implements Serializable {
 
     private String location;
 
-    @OneToOne(mappedBy = "bakery", cascade = CascadeType.ALL)
-    private Stock stock;
+    @OneToMany(mappedBy = "bakery", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StockProduct> stockProducts = new ArrayList<>();
 
     public Bakery(String name, String location) {
         this.name = name;
         this.location = location;
     }
 
-    public void addProduct(Product product, int quantity) {
-        stock.addProduct(product, quantity);
+    public void addProduct(Product product, Integer quantity) {
+        if (quantity > 0) {
+            for (StockProduct stockProduct : stockProducts){
+                if (stockProduct.getProduct().equals(product))
+                    stockProduct.setQuantity((stockProduct.getQuantity() + quantity));
+            }
+        }
     }
 
     public void removeProduct(Product product, int quantity) {
-        stock.removeProduct(product, quantity);
+        if (quantity > 0) {
+            for (StockProduct stockProduct : stockProducts){
+                if (stockProduct.getProduct().equals(product))
+                    stockProduct.setQuantity(Math.max(stockProduct.getQuantity() - quantity, 0));
+            }
+        }
     }
     
-    public boolean isProductAvailable(Product product, int quantity) {
-        return stock.checkStockAvailability(product, quantity);
+    public boolean isProductAvailable(Product product) {
+        for (StockProduct stockProduct : stockProducts){
+            if (stockProduct.getProduct().equals(product) && stockProduct.getQuantity() > 0)
+                return true;                
+        }
+        return false;
     }
 
     public Long getId() {
@@ -60,10 +79,11 @@ public class Bakery implements Serializable {
         this.location = location;
     }
 
-    public Stock getStock() {
-        return stock;
+    public List<StockProduct> getStockProducts() {
+        return stockProducts;
     }
-    public void setStock(Stock stock) {
-        this.stock = stock;
-    }  
+    public void setStock(List<StockProduct> stockProducts) {
+        this.stockProducts = stockProducts;
+    }
+ 
 }

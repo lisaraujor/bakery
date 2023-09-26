@@ -3,9 +3,9 @@ package com.bakery.backend.infrastructure.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.bakery.backend.domain.entities.Stock;
+import com.bakery.backend.domain.entities.StockProduct;
 
 @Repository
-public interface DbStockRepository extends JpaRepository<Stock, Long> {
+public interface DbStockProductRepository extends JpaRepository<StockProduct, Long> {
     // Adicione métodos de consulta personalizados, se necessário
 }

@@ -2,17 +2,19 @@ package com.bakery.backend.domain.entities;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "product")
-public class Product implements Serializable {
+public class Product {
     
-    @Id // Primary key
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
@@ -21,6 +23,9 @@ public class Product implements Serializable {
     private double price;
 
     private String description;
+
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL)
+    private StockProduct stockProduct;
 
     public Long getId() {
         return id;
