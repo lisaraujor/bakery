@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.bakery.backend.application.dtos.BakeryDTO;
 import com.bakery.backend.application.dtos.ProductDTO;
+import com.bakery.backend.application.dtos.StockProductDTO;
 import com.bakery.backend.application.services.BakeryService;
 import com.bakery.backend.application.services.StockService;
+import com.bakery.backend.domain.entities.StockProduct;
 import com.bakery.backend.infrastructure.models.ProductToStockRequest;
 
 @RestController
@@ -64,11 +66,10 @@ public class BakeryController {
         return ResponseEntity.ok(removedProduct);
     }
 
-    // @GetMapping("/isProductAvailable/{idBakery}")
-    // public ResponseEntity<Optional<BakeryDTO>> isProductAvailable(@PathVariable Long id) {
-    //     Optional<BakeryDTO> bakery = bakeryService.getById(id);
-    //     return ResponseEntity.ok(bakery);
-    // }
-    // TODO: Verififcar disponibilidade de um produto
+    @GetMapping("/isProductAvailable/{idBakery}")
+    public ResponseEntity<StockProductDTO> isProductAvailable(@PathVariable Long idBakery, @RequestBody ProductDTO product) {
+        StockProductDTO stockProduct = stockService.isProductAvailable(idBakery, product.getId());
+        return ResponseEntity.ok(stockProduct);
+    }
 
 }

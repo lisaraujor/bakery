@@ -9,10 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bakery.backend.application.dtos.ProductDTO;
+import com.bakery.backend.application.dtos.StockProductDTO;
 import com.bakery.backend.domain.entities.Bakery;
 import com.bakery.backend.domain.entities.Product;
 import com.bakery.backend.domain.entities.Stock;
 import com.bakery.backend.domain.entities.StockProduct;
+import com.bakery.backend.domain.exceptions.InvalidQuantityException;
 import com.bakery.backend.domain.exceptions.NotFoundException;
 import com.bakery.backend.infrastructure.repositories.DbBakeryRepository;
 import com.bakery.backend.infrastructure.repositories.DbProductRepository;
@@ -43,7 +45,10 @@ public class StockService {
         return stock;
     }
 
-    public ProductDTO addProduct(Long idBakery, Long idProduct, Integer quantity){        
+    public ProductDTO addProduct(Long idBakery, Long idProduct, Integer quantity){
+        if (quantity < 1)
+            throw new InvalidQuantityException("The quantity to be added cannot be less than 1.");        
+        
         Optional<Product> productOpt = dbProductRepository.findById(idProduct);
         Optional<Bakery> bakeryOpt = dbBakeryRepository.findById(idBakery);
         boolean existingProduct = false;
@@ -76,7 +81,10 @@ public class StockService {
         }
     }
 
-    public ProductDTO removeProduct(Long idBakery, Long idProduct, Integer quantity){        
+    public ProductDTO removeProduct(Long idBakery, Long idProduct, Integer quantity){
+        if (quantity < 1)
+            throw new InvalidQuantityException("The quantity to be removed cannot be less than 1.");        
+        
         Optional<Product> productOpt = dbProductRepository.findById(idProduct);
         Optional<Bakery> bakeryOpt = dbBakeryRepository.findById(idBakery);
 
@@ -101,7 +109,7 @@ public class StockService {
         }
     }
 
-    public boolean isProductAvailable(Long idBakery, Long idProduct) {
+    public StockProductDTO isProductAvailable(Long idBakery, Long idProduct) {
         Optional<Product> productOpt = dbProductRepository.findById(idProduct);
         Optional<Bakery> bakeryOpt = dbBakeryRepository.findById(idBakery);
 
@@ -111,10 +119,12 @@ public class StockService {
 
             List<StockProduct> stockProducts = bakery.getStock().getStockProducts();
             for (StockProduct stockProduct : stockProducts){
-                if (stockProduct.getProduct().equals(product) && stockProduct.getQuantity() > 0)
-                    return true;                
+                if (stockProduct.getProduct().equals(product) && stockProduct.getQuantity() > 0){
+                    ModelMapper mapper = new ModelMapper();
+                    return mapper.map(stockProduct, StockProductDTO.class);    
+                }            
             }
         }
-        return false;
+        throw new NotFoundException("Product with id " + idProduct + " not found.");
     }
 }
