@@ -70,7 +70,8 @@ public class BakeryService {
             Bakery bakery = existingBakeryOpt.get();
             bakery.addProduct(product, quantity);
 
-            //dbProductRepository.save(product);
+            dbProductRepository.save(product);
+            dbBakeryRepository.save(bakery);
 
             ModelMapper mapper = new ModelMapper();
             return mapper.map(product, ProductDTO.class);

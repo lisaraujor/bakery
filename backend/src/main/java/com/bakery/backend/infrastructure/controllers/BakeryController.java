@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import com.bakery.backend.application.dtos.BakeryDTO;
 import com.bakery.backend.application.dtos.ProductDTO;
 import com.bakery.backend.application.services.BakeryService;
+import com.bakery.backend.infrastructure.models.AddProductToStockRequest;
 
 @RestController
 @RequestMapping("/api/bakery")
@@ -39,8 +40,9 @@ public class BakeryController {
     }
 
     @PutMapping("/addProduct/{idBakery}")
-    public ResponseEntity<ProductDTO> addProduct(@PathVariable Integer idBakery, @RequestBody Integer idProduct, Integer quantity) {
-        ProductDTO addedProduct = bakeryService.addProductToStock(idBakery, idProduct, quantity);
+    public ResponseEntity<ProductDTO> addProduct(@PathVariable int idBakery, @RequestBody AddProductToStockRequest addProductToStockRequest) {
+        System.out.println("aaaaaaaa");
+        ProductDTO addedProduct = bakeryService.addProductToStock(idBakery, addProductToStockRequest.getIdProduct(), addProductToStockRequest.getQuantity());
         return ResponseEntity.ok(addedProduct);
     }
 
