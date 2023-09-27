@@ -1,13 +1,9 @@
 package com.bakery.backend.domain.entities;
 
-import java.io.Serializable;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -15,7 +11,7 @@ import javax.persistence.Table;
 public class Product {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -24,8 +20,14 @@ public class Product {
 
     private String description;
 
-    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL)
-    private StockProduct stockProduct;
+    public Product() {
+
+    }
+    public Product(String name, double price, String description) {
+        this.name = name;
+        this.price = price;
+        this.description = description;
+    }
 
     public Long getId() {
         return id;

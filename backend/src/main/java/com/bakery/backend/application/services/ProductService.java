@@ -6,7 +6,7 @@ import org.modelmapper.ModelMapper;
 
 import com.bakery.backend.application.dtos.ProductDTO;
 import com.bakery.backend.domain.entities.Product;
-import com.bakery.backend.domain.exceptions.ProductNotFoundException;
+import com.bakery.backend.domain.exceptions.NotFoundException;
 import com.bakery.backend.infrastructure.repositories.DbProductRepository;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class ProductService {
         Optional<Product> product = dbProductRepository.findById(id);
         
         if(product.isEmpty()){
-            throw new ProductNotFoundException("Product with id " + id + " not found.");
+            throw new NotFoundException("Product with id " + id + " not found.");
         }
 
         ProductDTO dto = new ModelMapper().map(product.get(), ProductDTO.class);
@@ -73,7 +73,7 @@ public class ProductService {
             return mapper.map(product, ProductDTO.class);
         }
         else {
-            throw new ProductNotFoundException("Product with id " + id + " not found.");
+            throw new NotFoundException("Product with id " + id + " not found.");
         }
     }
 
@@ -82,7 +82,7 @@ public class ProductService {
         Optional<Product> product = dbProductRepository.findById(id);
 
         if(product.isEmpty()){
-            throw new ProductNotFoundException("Product with id " + id + " not found.");
+            throw new NotFoundException("Product with id " + id + " not found.");
         }
 
         dbProductRepository.deleteById(id);

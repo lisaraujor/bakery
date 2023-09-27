@@ -7,5 +7,5 @@ import com.bakery.backend.domain.entities.StockProduct;
 
 @Repository
 public interface DbStockProductRepository extends JpaRepository<StockProduct, Long> {
-    // Adicione métodos de consulta personalizados, se necessário
+
 }

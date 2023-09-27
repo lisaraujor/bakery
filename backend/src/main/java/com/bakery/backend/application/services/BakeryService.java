@@ -1,5 +1,6 @@
 package com.bakery.backend.application.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -10,38 +11,24 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.bakery.backend.application.dtos.BakeryDTO;
-import com.bakery.backend.application.dtos.ProductDTO;
 import com.bakery.backend.domain.entities.Bakery;
-import com.bakery.backend.domain.entities.Product;
-import com.bakery.backend.domain.entities.StockProduct;
-import com.bakery.backend.domain.exceptions.ProductNotFoundException;
+import com.bakery.backend.domain.entities.Stock;
+import com.bakery.backend.domain.exceptions.NotFoundException;
 import com.bakery.backend.infrastructure.repositories.DbBakeryRepository;
-import com.bakery.backend.infrastructure.repositories.DbProductRepository;
 
 @Service
 public class BakeryService {
-    private final DbProductRepository dbProductRepository;
     private final DbBakeryRepository dbBakeryRepository;
+    private final StockService stockService;
 
     @Autowired
-    public BakeryService(DbProductRepository dbProductRepository, DbBakeryRepository dbBakeryRepository) {
-        this.dbProductRepository = dbProductRepository;
+    public BakeryService(DbBakeryRepository dbBakeryRepository, StockService stockService) {
         this.dbBakeryRepository = dbBakeryRepository;
+        this.stockService = stockService;
     }
 
-    // public Optional<ProductDTO> getById(Long id){
-    //     Optional<Product> product = dbProductRepository.findById(id);
-        
-    //     if(product.isEmpty()){
-    //         throw new ProductNotFoundException("Product with id " + id + " not found.");
-    //     }
-
-    //     ProductDTO dto = new ModelMapper().map(product.get(), ProductDTO.class);
-    //     return Optional.of(dto);
-    // }
-
     public List<BakeryDTO> getAll(){
-        Sort sort = Sort.by(Sort.Direction.ASC, "id"); // Ordenar por ID em ordem crescente
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
         List<Bakery> bakerys = dbBakeryRepository.findAll(sort);
 
         return bakerys.stream()
@@ -49,10 +36,22 @@ public class BakeryService {
         .collect(Collectors.toList());
     }
 
+    public Optional<BakeryDTO> getById(Long id){
+        Optional<Bakery> bakeryOpt = dbBakeryRepository.findById(id);
+        
+        if(bakeryOpt.isEmpty()){
+            throw new NotFoundException("Bakery with id " + id + " not found.");
+        }
+
+        BakeryDTO dto = new ModelMapper().map(bakeryOpt.get(), BakeryDTO.class);
+        return Optional.of(dto);
+    }
+
     public BakeryDTO create(BakeryDTO bakeryDto){
         bakeryDto.setId(null);
-        
-        Bakery bakery = new Bakery(bakeryDto.getName(), bakeryDto.getLocation());
+
+        Stock stock = stockService.create();
+        Bakery bakery = new Bakery(bakeryDto.getName(), bakeryDto.getLocation(), stock);
         bakery = dbBakeryRepository.save(bakery);
 
         bakeryDto.setId(bakery.getId());
@@ -60,35 +59,36 @@ public class BakeryService {
         return bakeryDto;
     }
 
-    public ProductDTO addProductToStock(int idBakery, int idProduct, int quantity){
-
-        Optional<Product> existingProductOpt = dbProductRepository.findById((long)idProduct);
-        Optional<Bakery> existingBakeryOpt = dbBakeryRepository.findById((long)idBakery);
+    public BakeryDTO update(Long id, BakeryDTO bakeryDto){
         
-        if (existingProductOpt.isPresent()){
-            Product product = existingProductOpt.get();
-            Bakery bakery = existingBakeryOpt.get();
-            bakery.addProduct(product, quantity);
+        Optional<Bakery> bakeryOpt = dbBakeryRepository.findById(id);
+        
+        if (bakeryOpt.isPresent()){
+            Bakery bakery = bakeryOpt.get();
 
-            dbProductRepository.save(product);
+            if (!bakeryDto.getName().isEmpty())
+                bakery.setName(bakeryDto.getName());
+            if (!bakeryDto.getLocation().isEmpty())
+                bakery.setLocation(bakeryDto.getLocation());
+
             dbBakeryRepository.save(bakery);
 
             ModelMapper mapper = new ModelMapper();
-            return mapper.map(product, ProductDTO.class);
+            return mapper.map(bakery, BakeryDTO.class);
         }
         else {
-            throw new ProductNotFoundException("Product with id " + idProduct + " not found. It was not possible add to Stock.");
+            throw new NotFoundException("Bakery with id " + id + " not found.");
         }
     }
 
-    // public void delete(Long id) {
+    public void delete(Long id) {
 
-    //     Optional<Product> product = dbProductRepository.findById(id);
+        Optional<Bakery> bakeryOpt = dbBakeryRepository.findById(id);
 
-    //     if(product.isEmpty()){
-    //         throw new ProductNotFoundException("Product with id " + id + " not found.");
-    //     }
+        if(bakeryOpt.isEmpty()){
+            throw new NotFoundException("Bakery with id " + id + " not found.");
+        }
 
-    //     dbProductRepository.deleteById(id);
-    // }
+        dbBakeryRepository.deleteById(id);
+    }
 }

@@ -2,8 +2,6 @@ package com.bakery.backend.application.dtos;
 
 import java.util.List;
 
-import com.bakery.backend.domain.entities.StockProduct;
-
 public class BakeryDTO {
     private Long id;
 
@@ -11,7 +9,7 @@ public class BakeryDTO {
 
     private String location;
 
-    private List<StockProduct> stockProducts;
+    private List<StockProductDTO> stockProducts;
 
     public Long getId() {
         return id;
@@ -34,10 +32,10 @@ public class BakeryDTO {
         this.location = location;
     }
 
-    public List<StockProduct> getStockProducts() {
+    public List<StockProductDTO> getStockProducts() {
         return stockProducts;
     }
-    public void setStockProducts(List<StockProduct> stockProducts) {
+    public void setStockProducts(List<StockProductDTO> stockProducts) {
         this.stockProducts = stockProducts;
     }
 }

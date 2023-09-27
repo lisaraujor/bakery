@@ -1,14 +1,12 @@
 package com.bakery.backend.domain.entities;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 
@@ -17,49 +15,25 @@ import javax.persistence.Table;
 public class Bakery {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
 
     private String location;
 
-    @OneToMany(mappedBy = "bakery", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StockProduct> stockProducts = new ArrayList<>();
+    @OneToOne
+    @JoinColumn(name = "stock_id")
+    private Stock stock;
 
     public Bakery() {
-        // Empty constructor
+
     }
 
-    public Bakery(String name, String location) {
+    public Bakery(String name, String location, Stock stock) {
         this.name = name;
         this.location = location;
-    }
-
-    public void addProduct(Product product, Integer quantity) {
-        if (quantity > 0) {
-            for (StockProduct stockProduct : stockProducts){
-                if (stockProduct.getProduct().equals(product))
-                    stockProduct.setQuantity((stockProduct.getQuantity() + quantity));
-            }
-        }
-    }
-
-    public void removeProduct(Product product, int quantity) {
-        if (quantity > 0) {
-            for (StockProduct stockProduct : stockProducts){
-                if (stockProduct.getProduct().equals(product))
-                    stockProduct.setQuantity(Math.max(stockProduct.getQuantity() - quantity, 0));
-            }
-        }
-    }
-    
-    public boolean isProductAvailable(Product product) {
-        for (StockProduct stockProduct : stockProducts){
-            if (stockProduct.getProduct().equals(product) && stockProduct.getQuantity() > 0)
-                return true;                
-        }
-        return false;
+        this.stock = stock;
     }
 
     public Long getId() {
@@ -80,11 +54,10 @@ public class Bakery {
         this.location = location;
     }
 
-    public List<StockProduct> getStockProducts() {
-        return stockProducts;
+    public Stock getStock() {
+        return stock;
     }
-    public void setStock(List<StockProduct> stockProducts) {
-        this.stockProducts = stockProducts;
+    public void setStock(Stock stock) {
+        this.stock = stock;
     }
- 
 }
