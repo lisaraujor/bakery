@@ -12,19 +12,17 @@ import org.springframework.stereotype.Service;
 
 import com.bakery.backend.application.dtos.BakeryDTO;
 import com.bakery.backend.domain.entities.Bakery;
-import com.bakery.backend.domain.entities.Stock;
+import com.bakery.backend.domain.entities.StockProduct;
 import com.bakery.backend.domain.exceptions.NotFoundException;
 import com.bakery.backend.infrastructure.repositories.DbBakeryRepository;
 
 @Service
 public class BakeryService {
     private final DbBakeryRepository dbBakeryRepository;
-    private final StockService stockService;
 
     @Autowired
-    public BakeryService(DbBakeryRepository dbBakeryRepository, StockService stockService) {
+    public BakeryService(DbBakeryRepository dbBakeryRepository) {
         this.dbBakeryRepository = dbBakeryRepository;
-        this.stockService = stockService;
     }
 
     public List<BakeryDTO> getAll(){
@@ -50,7 +48,7 @@ public class BakeryService {
     public BakeryDTO create(BakeryDTO bakeryDto){
         bakeryDto.setId(null);
 
-        Stock stock = stockService.create();
+        List<StockProduct> stock = new ArrayList<>();
         Bakery bakery = new Bakery(bakeryDto.getName(), bakeryDto.getLocation(), stock);
         bakery = dbBakeryRepository.save(bakery);
 

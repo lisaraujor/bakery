@@ -23,17 +23,17 @@ public class StockProduct {
     private Integer quantity;
 
     @ManyToOne
-    @JoinColumn(name = "stock_id")
-    private Stock stock;
+    @JoinColumn(name = "bakery_id")
+    private Bakery bakery;
 
     public StockProduct() {
         this.product = new Product();
         this.quantity = 0;
     }
-    public StockProduct(Product product, Integer quantity, Stock stock) {
+    public StockProduct(Product product, Integer quantity, Bakery bakery) {
         this.product = product;
         this.quantity = quantity;
-        this.stock = stock;
+        this.bakery = bakery;
     }
 
     public Long getId() {
@@ -57,10 +57,10 @@ public class StockProduct {
         this.quantity = quantity;
     }
 
-    public Stock getStock() {
-        return stock;
+    public Bakery getBakery() {
+        return bakery;
     }
-    public void setStock(Stock stock) {
-        this.stock = stock;
+    public void setBakery(Bakery bakery) {
+        this.bakery = bakery;
     }
 }

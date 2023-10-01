@@ -1,6 +1,5 @@
 package com.bakery.backend.application.services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,37 +11,24 @@ import com.bakery.backend.application.dtos.ProductDTO;
 import com.bakery.backend.application.dtos.StockProductDTO;
 import com.bakery.backend.domain.entities.Bakery;
 import com.bakery.backend.domain.entities.Product;
-import com.bakery.backend.domain.entities.Stock;
 import com.bakery.backend.domain.entities.StockProduct;
 import com.bakery.backend.domain.exceptions.InvalidQuantityException;
 import com.bakery.backend.domain.exceptions.NotFoundException;
 import com.bakery.backend.infrastructure.repositories.DbBakeryRepository;
 import com.bakery.backend.infrastructure.repositories.DbProductRepository;
 import com.bakery.backend.infrastructure.repositories.DbStockProductRepository;
-import com.bakery.backend.infrastructure.repositories.DbStockRepository;
 
 @Service
 public class StockService {
     private final DbBakeryRepository dbBakeryRepository;
-    private final DbStockRepository dbStockRepository;
     private final DbStockProductRepository dbStockProductRepository;
     private final DbProductRepository dbProductRepository;
 
     @Autowired
-    public StockService(DbBakeryRepository dbBakeryRepository, DbStockProductRepository dbStockProductRepository, DbProductRepository dbProductRepository, DbStockRepository dbStockRepository) {
+    public StockService(DbBakeryRepository dbBakeryRepository, DbStockProductRepository dbStockProductRepository, DbProductRepository dbProductRepository) {
         this.dbBakeryRepository = dbBakeryRepository;
-        this.dbStockRepository = dbStockRepository;
         this.dbStockProductRepository = dbStockProductRepository;
         this.dbProductRepository = dbProductRepository;
-    }
-
-    public Stock create(){
-        List<StockProduct> stockProducts = new ArrayList<>();
-        
-        Stock stock = new Stock(stockProducts);
-        stock = dbStockRepository.save(stock);
-
-        return stock;
     }
 
     public ProductDTO addProduct(Long idBakery, Long idProduct, Integer quantity){
@@ -57,7 +43,7 @@ public class StockService {
             Product product = productOpt.get();
             Bakery bakery = bakeryOpt.get();
 
-            List<StockProduct> stockProducts = bakery.getStock().getStockProducts();
+            List<StockProduct> stockProducts = bakery.getStock();
             for (StockProduct stockProduct : stockProducts){
                 if (stockProduct.getProduct().getId() == idProduct){
                     stockProduct.setQuantity((stockProduct.getQuantity() + quantity));
@@ -66,7 +52,7 @@ public class StockService {
                 }
             }
             if (!existingProduct){
-                StockProduct stockProductNew = new StockProduct(product, quantity, bakery.getStock());
+                StockProduct stockProductNew = new StockProduct(product, quantity, bakery);
                 stockProducts.add(stockProductNew);
                 dbStockProductRepository.save(stockProductNew);
             }
@@ -92,7 +78,7 @@ public class StockService {
             Product product = productOpt.get();
             Bakery bakery = bakeryOpt.get();
 
-            List<StockProduct> stockProducts = bakery.getStock().getStockProducts();
+            List<StockProduct> stockProducts = bakery.getStock();
             for (StockProduct stockProduct : stockProducts){
                 if (stockProduct.getProduct().getId() == idProduct){
                     stockProduct.setQuantity(Math.max(stockProduct.getQuantity() - quantity, 0));
@@ -117,7 +103,7 @@ public class StockService {
             Product product = productOpt.get();
             Bakery bakery = bakeryOpt.get();
 
-            List<StockProduct> stockProducts = bakery.getStock().getStockProducts();
+            List<StockProduct> stockProducts = bakery.getStock();
             for (StockProduct stockProduct : stockProducts){
                 if (stockProduct.getProduct().equals(product) && stockProduct.getQuantity() > 0){
                     ModelMapper mapper = new ModelMapper();

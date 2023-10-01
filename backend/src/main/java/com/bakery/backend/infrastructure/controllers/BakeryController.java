@@ -14,7 +14,6 @@ import com.bakery.backend.application.dtos.ProductDTO;
 import com.bakery.backend.application.dtos.StockProductDTO;
 import com.bakery.backend.application.services.BakeryService;
 import com.bakery.backend.application.services.StockService;
-import com.bakery.backend.domain.entities.StockProduct;
 import com.bakery.backend.infrastructure.models.ProductToStockRequest;
 
 @RestController

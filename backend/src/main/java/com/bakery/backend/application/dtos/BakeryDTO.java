@@ -9,7 +9,7 @@ public class BakeryDTO {
 
     private String location;
 
-    private List<StockProductDTO> stockProducts;
+    private List<StockProductDTO> stock;
 
     public Long getId() {
         return id;
@@ -32,10 +32,10 @@ public class BakeryDTO {
         this.location = location;
     }
 
-    public List<StockProductDTO> getStockProducts() {
-        return stockProducts;
+    public List<StockProductDTO> getStock() {
+        return stock;
     }
-    public void setStockProducts(List<StockProductDTO> stockProducts) {
-        this.stockProducts = stockProducts;
+    public void setStock(List<StockProductDTO> stock) {
+        this.stock = stock;
     }
 }
