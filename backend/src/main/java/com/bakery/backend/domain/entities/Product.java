@@ -4,12 +4,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "product")
 public class Product {
     
-    @Id // Primary key
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -17,6 +19,15 @@ public class Product {
     private double price;
 
     private String description;
+
+    public Product() {
+
+    }
+    public Product(String name, double price, String description) {
+        this.name = name;
+        this.price = price;
+        this.description = description;
+    }
 
     public Long getId() {
         return id;
